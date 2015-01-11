@@ -36,6 +36,8 @@ var Enemy = function() {
     this.x = randomIntFromInterval(-50, -500);
     this.y = enemyRows[randRow];
     this.speed = randomIntFromInterval(100, 300);
+    // Dimensions thanks to Matthew Prather 
+    this.collisionBox = {x: 2, y: 78, width: 97, height: 66};
 }
 
 // Update the enemy's position, required method for game
@@ -75,6 +77,8 @@ var Player = function() {
     this.x = (gameCol * tileWidth) / 2 - (playerWidth / 2);
     this.y = 405;
     this.row = 5;
+    // Dimensions thanks to Matthew Prather 
+    this.collisionBox = {x: 18, y: 64, width: 66, height: 95};
 }
 
 // Update the player's position, required for game
@@ -119,6 +123,17 @@ Player.prototype.reset = function() {
     this.row = 5; 
 }
 
+// Class to implement life 
+var Life = function() {
+    this.sprite = 'images/Heart.png';
+    this.x = 0;
+    this.y = 0;
+}
+
+// Draw the heart on the screen
+Life.prototype.render = function() {
+        //ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+}
 
 // Now instantiate your objects.
 // Place all enemy objects in an array called allEnemies
@@ -134,15 +149,22 @@ var allEnemies = [enemy1, enemy2, enemy3, enemy4];
 
 //Creating a player object using class to create player above
 var player = new Player();
+var life = new Life();
 
 // This listens for key presses and sends the keys to your
 // Player.handleInput() method. You don't need to modify this.
 document.addEventListener('keyup', function(e) {
     var allowedKeys = {
+        // Add wasd keys to be kind to our left handers 
         37: 'left',
+        65: 'left',
         38: 'up',
+        87: 'up',
         39: 'right',
-        40: 'down'
+        68: 'right',
+        40: 'down',
+        83: 'down'
+
     };
 
     player.handleInput(allowedKeys[e.keyCode]);
