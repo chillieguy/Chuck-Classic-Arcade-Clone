@@ -3,25 +3,16 @@
 // ***TODO*** Figure out how to calculate these at run time
 var gameWidth = 505;
 var gameHeight = 606;
-var tileWidth = 101;
-var tileHeight = 171;
 var gameCol = 5;
 var gameRow = 6;
+var active = true;
 //Redundent with tile demensions, but keeping seperate incase one or the other changes
-var playerWidth = 101;
-var playerHeight = 171;
-var enemyRow1 = 60;
-var enemyRow2 = 143;
-var enemyRow3 = 226;
-var enemyRow4 = 309;
-var enemyRows = [enemyRow1, enemyRow2, enemyRow3, enemyRow4];
-var playerRow1 = -13;
-var playerRow2 = 70;
-var playerRow3 = 153;
-var playerRow4 = 236;
-var playerRow5 = 319;
-var playerRow6 = 402;
-var playerRows = [playerRow1, playerRow2, playerRow3, playerRow4, playerRow5, playerRow6]
+var enemyRows = [60, 143, 226, 309];
+var playerRows = [-13, 70, 153, 236, 319, 402];
+
+// CONSTANTS
+var GEM_X = [0, 101, 202, 303, 404];
+var GEM_Y = [73, 156, 239, 322];
 
 // Enemies our player must avoid
 var Enemy = function() {
@@ -36,8 +27,6 @@ var Enemy = function() {
     this.x = randomIntFromInterval(-50, -500);
     this.y = enemyRows[randRow];
     this.speed = randomIntFromInterval(100, 300);
-    // Dimensions thanks to Matthew Prather 
-    this.collisionBox = {x: 2, y: 78, width: 97, height: 66};
 }
 
 // Update the enemy's position, required method for game
@@ -53,12 +42,12 @@ Enemy.prototype.update = function(dt) {
         var randRow = randomIntFromInterval(0, enemyRows.length -1);
         this.row = randRow + 1;
         this.y = enemyRows[randRow];
-        console.log('Bug Row: ' + this.row);
     }
 
     // Check if hit player and reset if needed
     if (this.row == player.row) {
         if (this.x + 70 >= player.x && this.x <= player.x + 70) {
+            player.life -=1;
             player.reset();
         }
     }
@@ -74,11 +63,12 @@ Enemy.prototype.render = function() {
 // a handleInput() method.
 var Player = function() {
     this.sprite = 'images/char-horn-girl.png';
-    this.x = (gameCol * tileWidth) / 2 - (playerWidth / 2);
+    this.gameOver = 'images/GameOver.png';
+    this.x = 202;
     this.y = 405;
+    this.life = 5;
     this.row = 5;
-    // Dimensions thanks to Matthew Prather 
-    this.collisionBox = {x: 18, y: 64, width: 66, height: 95};
+    active = true;
 }
 
 // Update the player's position, required for game
@@ -87,18 +77,21 @@ Player.prototype.update = function(dt) {
     if (this.y <= 60) {
         this.reset();
     }
+
+    if (this.life === 0) {
+        active = false;
+        ctx.drawImage(Resources.get(this.gameOver), 10, 10);
+    }
 }
 
 Player.prototype.handleInput = function(key) {
     if (key == 'up' && this.y >= 60) {
         this.y = this.y - 83;
         this.row += -1;
-        console.log(this.row);
     }
     if (key == 'down' && this.y <= 399) {
         this.y = this.y + 83;
         this.row += 1;
-        console.log(this.row);
     }
     if (key == 'right' && this.x <= 402) {
         this.x = this.x + 101;
@@ -106,9 +99,16 @@ Player.prototype.handleInput = function(key) {
     if (key == 'left' && this.x >= 1) {
         this.x = this.x - 101;
     }
-    // Remove - Added to check player position during testing
-    console.log('x: ' + this.x);
-    console.log('y: ' + this.y);
+    if (key == 'reset') {
+        this.newGame();
+    }
+    if (key == 'pause') {
+        if (active) {
+            active = false;
+        } else {
+            active = true;
+        }
+    }
 }
 
 // Draw the player on the screen, required method for game
@@ -118,21 +118,25 @@ Player.prototype.render = function() {
 
 // Reset player back to starting position
 Player.prototype.reset = function() {
-    this.x = (gameCol * tileWidth) / 2 - (playerWidth / 2);
+    this.x = 202;
     this.y = 405;
-    this.row = 5; 
+    this.row = 5;
 }
 
-// Class to implement life 
+Player.prototype.newGame = function() {
+     player = new Player();    
+}
+
 var Life = function() {
-    this.sprite = 'images/Heart.png';
-    this.x = 0;
-    this.y = 0;
+    this.sprite = 'images/Heart_Small.png';
 }
 
-// Draw the heart on the screen
 Life.prototype.render = function() {
-        //ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+    var x = 10;
+    for (var i = 0; i < player.life; i++) {
+        ctx.drawImage(Resources.get(this.sprite), x, 60);
+        x += 35;   
+    }
 }
 
 // Now instantiate your objects.
@@ -163,13 +167,22 @@ document.addEventListener('keyup', function(e) {
         39: 'right',
         68: 'right',
         40: 'down',
-        83: 'down'
+        83: 'down',
+        // Future keys to be implemented for pause and rest
+        82: 'reset',
+        80: 'pause'
 
     };
 
     player.handleInput(allowedKeys[e.keyCode]);
 });
 
+// This listens for key presses and disables default scroll actions.
+document.addEventListener('keydown', function(e) {
+  if ([37, 38, 39, 40, 65, 68, 80, 82, 83].indexOf(e.keyCode) > -1) {
+    e.preventDefault();
+  }  
+}, false);
 
 // Global functions not tied to a class or object
 
@@ -177,11 +190,4 @@ document.addEventListener('keyup', function(e) {
 function randomIntFromInterval(min,max)
 {
     return Math.floor(Math.random()*(max-min+1)+min);
-}
-
-// Check collision between player and enemy-bug
-function checkBugCollision () {
-    allEnemies.foreach(function() {
-
-    })
 }
