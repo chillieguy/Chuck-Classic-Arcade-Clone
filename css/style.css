@@ -1,3 +1,14 @@
 body {
     text-align: center;
-}
+    font-size: 24px;
+    font-family: fantasy;
+ }
+
+ .title {
+ 	margin-bottom: -25px;
+ 	font-size: 48px;
+ }
+
+ .directions {
+ 	margin: -15px;
+ }
