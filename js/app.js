@@ -69,12 +69,14 @@ var Player = function() {
     this.life = 5;
     this.row = 5;
     active = true;
+    this.score = 0;
 }
 
 // Update the player's position, required for game
 // Parameter: dt, a time delta between ticks
 Player.prototype.update = function(dt) {
     if (this.y <= 60) {
+        this.score += 1;
         this.reset();
     }
 
@@ -114,6 +116,8 @@ Player.prototype.handleInput = function(key) {
 // Draw the player on the screen, required method for game
 Player.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+    ctx.font = '36px Fantasy';
+    ctx.fillText('SCORE: ' + this.score, 345, 90);
 }
 
 // Reset player back to starting position
@@ -139,6 +143,14 @@ Life.prototype.render = function() {
     }
 }
 
+var Score = function() {
+     
+}
+
+Score.prototype.render = function() {
+    
+}
+
 // Now instantiate your objects.
 // Place all enemy objects in an array called allEnemies
 
@@ -154,6 +166,7 @@ var allEnemies = [enemy1, enemy2, enemy3, enemy4];
 //Creating a player object using class to create player above
 var player = new Player();
 var life = new Life();
+var score = new Score();
 
 // This listens for key presses and sends the keys to your
 // Player.handleInput() method. You don't need to modify this.
