@@ -63,7 +63,6 @@ Enemy.prototype.render = function() {
 // a handleInput() method.
 var Player = function() {
     this.sprite = 'images/char-horn-girl.png';
-    this.gameOver = 'images/GameOver.png';
     this.x = 202;
     this.y = 405;
     this.life = 5;
@@ -82,23 +81,22 @@ Player.prototype.update = function(dt) {
 
     if (this.life === 0) {
         active = false;
-        ctx.drawImage(Resources.get(this.gameOver), 10, 10);
     }
 }
 
 Player.prototype.handleInput = function(key) {
-    if (key == 'up' && this.y >= 60) {
+    if (key == 'up' && this.y >= 60 && active) {
         this.y = this.y - 83;
         this.row += -1;
     }
-    if (key == 'down' && this.y <= 399) {
+    if (key == 'down' && this.y <= 399 && active) {
         this.y = this.y + 83;
         this.row += 1;
     }
-    if (key == 'right' && this.x <= 402) {
+    if (key == 'right' && this.x <= 402 && active) {
         this.x = this.x + 101;
     }
-    if (key == 'left' && this.x >= 1) {
+    if (key == 'left' && this.x >= 1 && active) {
         this.x = this.x - 101;
     }
     if (key == 'reset') {
@@ -118,6 +116,11 @@ Player.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
     ctx.font = '36px Fantasy';
     ctx.fillText('SCORE: ' + this.score, 345, 90);
+    
+    if (this.life === 0) {
+        ctx.font = '72px Fantasy';
+        ctx.fillText('GAME OVER!', 90, 365);    
+    }
 }
 
 // Reset player back to starting position
@@ -143,14 +146,6 @@ Life.prototype.render = function() {
     }
 }
 
-var Score = function() {
-     
-}
-
-Score.prototype.render = function() {
-    
-}
-
 // Now instantiate your objects.
 // Place all enemy objects in an array called allEnemies
 
@@ -166,7 +161,6 @@ var allEnemies = [enemy1, enemy2, enemy3, enemy4];
 //Creating a player object using class to create player above
 var player = new Player();
 var life = new Life();
-var score = new Score();
 
 // This listens for key presses and sends the keys to your
 // Player.handleInput() method. You don't need to modify this.
