@@ -1,5 +1,5 @@
 /* Define variables that I will need to use later
- ***TODO*** Figure out how to calculate these at run time
+ *** Figure out how to calculate these at run time
  */
 var gameWidth = 505;
 var gameHeight = 606;
