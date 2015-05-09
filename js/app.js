@@ -122,10 +122,10 @@ Player.prototype.handleInput = function(key) {
 Player.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
     ctx.font = '36px Fantasy';
-    ctx.fillText('SCORE: ' + this.score, 345, 90);
+    ctx.fillText('SCORE: ' + this.score, 315, 90);
     if (this.life === 0) {
         ctx.font = '72px Fantasy';
-        ctx.fillText('GAME OVER!', 90, 365);    
+        ctx.fillText('GAME OVER!', 35, 305);    
     }
 }
 
